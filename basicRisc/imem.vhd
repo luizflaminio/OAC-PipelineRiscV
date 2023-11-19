@@ -2,7 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use STD.TEXTIO.all;
-use ieee.std_logic_textio.all;
 
 entity imem is
     port(
@@ -15,29 +14,22 @@ architecture behave of imem is
 
     type ramtype is array(63 downto 0) of STD_LOGIC_VECTOR(31 downto 0);
     -- initialize memory from file
-    impure function init_ram_hex return ramtype is
+    impure function init_ram_hex(carga: in string) return ramtype is
+        file arq: text open read_mode is carga;
+        variable linha_atual: line;
+        variable dado_atual: bit_vector(31 downto 0);
+        variable mem_ready: ramtype;
 
-        file text_file : text open read_mode is "riscvtest.txt";
-        
-        variable text_line : line;
-        variable ram_content : ramtype;
-        variable i : integer := 0;
-        
-        begin
-        for i in 0 to 63 loop -- set all contents low
-            ram_content(i) := (others => '0');
+    begin
+        for i in ramtype'range loop
+            readline(arq, linha_atual); -- Le a primeira linha
+            read(linha_atual, dado_atual); -- Busca bit vector na linha e salva no "buffer"
+            mem_ready(i) := to_stdlogicvector(dado_atual); -- escreve na memoria-retorno o dado do "buffer"
         end loop;
-			i := 0;
-        while not endfile(text_file) loop -- set contents from file
-            readline(text_file, text_line);
-            hread(text_line, ram_content(i));
-            i := i + 1;
-        end loop;
+            return mem_ready;
+    end;
 
-        return ram_content;
-    end function;
-
-    signal mem : ramtype := init_ram_hex;
+    signal mem : ramtype := init_ram_hex("riscvtest.txt");
 begin
     -- read memory
     process(a) begin
