@@ -12,6 +12,5 @@ end;
 architecture behave of mux2 is
 
 begin
-
   y <= d1 when s = '1' else d0;
 end;

@@ -79,14 +79,13 @@ architecture struct of datapath is
     signal Result:  STD_LOGIC_VECTOR(31 downto 0);
 begin
 
-    -- next PC logic
-
+    -- next PC logic - IF step
     pcreg: flopr generic map(32) port map(clk, reset, PCNext, s_pc);
     pcadd4: adder port map(s_pc, X"00000004", PCPlus4);
     pcaddbranch: adder port map(s_pc, ImmExt, PCTarget);
     pcmux: mux2 generic map(32) port map(PCPlus4, PCTarget, PCSrc,PCNext);
-    -- register file logic
 
+    -- register file logic
     rf: regfile port map(clk, RegWrite, Instr(19 downto 15), Instr(24 downto 20), Instr(11 downto 7),
 
     Result, SrcA, s_writeData);

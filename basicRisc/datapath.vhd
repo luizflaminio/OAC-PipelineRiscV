@@ -88,8 +88,8 @@ begin
     -- register file logic
 
     rf: regfile port map(clk, RegWrite, Instr(19 downto 15), Instr(24 downto 20), Instr(11 downto 7),
-
     Result, SrcA, s_writeData);
+    
     ext: extend port map(Instr(31 downto 7), ImmSrc, ImmExt);
     -- ALU logic
 
