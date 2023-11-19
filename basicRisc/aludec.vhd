@@ -1,5 +1,6 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity aludec is
 
@@ -17,7 +18,7 @@ architecture behave of aludec is
 
 begin
 
-  RtypeSub <= funct7b5 and opb5; -- TRUE for R–type subtract
+  RtypeSub <= funct7b5 and opb5; --TRUE for Rtype subtract
 
   process(opb5, funct3, funct7b5, ALUOp, RtypeSub) begin
 
@@ -25,9 +26,9 @@ begin
 
     when "00" => ALUControl <= "000"; -- addition
     when "01" => ALUControl <= "001"; -- subtraction
-    when others => case funct3 is -- R–type or I–type ALU
+    when others => case funct3 is -- Rtype or Itype ALU
 
-            when "000" = if RtypeSub = '1' then
+            when "000" => if RtypeSub = '1' then
                 ALUControl <= "001"; -- sub
             else
                 ALUControl <= "000"; -- add, addi

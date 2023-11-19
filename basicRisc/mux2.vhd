@@ -1,10 +1,11 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity mux2 is
   generic(width: integer := 8);
   port(
-    d0, d1  : in  STD_LOGIC_VECTOR(width-1 downto 0);
+    d0, d1  :  in  STD_LOGIC_VECTOR(width-1 downto 0);
     s       :  in  STD_LOGIC;
     y       :  out STD_LOGIC_VECTOR(width-1 downto 0));
 end;

@@ -1,5 +1,6 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 entity maindec is
     port(
@@ -24,11 +25,11 @@ begin
  case op is
     when "0000011" => controls <= "10010010000"; -- lw
     when "0100011" => controls <= "00111000000"; -- sw
-    when "0110011" => controls <= "1000000100"; -- R–type
+    when "0110011" => controls <= "10000000100"; -- R-type
     when "1100011" => controls <= "01000001010"; -- beq
-    when "0010011" => controls <= "10010000100"; -- I–type ALU
+    when "0010011" => controls <= "10010000100"; -- I-type ALU
     when "1101111" => controls <= "11100100001"; -- jal
-    when others => controls <= "0000000000"; -- not valid
+    when others => controls    <= "00000000000"; -- not valid
 
  end case;
 
