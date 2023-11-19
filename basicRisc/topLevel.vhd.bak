@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity topLevel is
+entity top is
     port(
         clk, reset: in STD_LOGIC;
         WriteData, DataAdr: out STD_LOGIC_VECTOR(31 downto 0);
@@ -10,7 +10,7 @@ entity topLevel is
     );
 end;
 
-architecture test of topLevel is
+architecture test of top is
     component riscvsingle
     port(
         clk, reset: in STD_LOGIC;

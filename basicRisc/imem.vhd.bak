@@ -27,7 +27,7 @@ architecture behave of imem is
         for i in 0 to 63 loop -- set all contents low
             ram_content(i) := (others => '0');
         end loop;
-			i := 0;
+    
         while not endfile(text_file) loop -- set contents from file
             readline(text_file, text_line);
             hread(text_line, ram_content(i));
@@ -41,6 +41,6 @@ architecture behave of imem is
 begin
     -- read memory
     process(a) begin
-        rd <= mem(to_integer(unsigned(a(31 downto 2))));
+        rd <= mem(to_integer(a(31 downto 2)));
     end process;
 end;
