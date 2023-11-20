@@ -21,8 +21,8 @@ architecture arch_regF of regFileIF_ID is
             q               : out std_logic_vector(width-1 downto 0));
     end component;
 begin
-    regRdF      : flopenr generic(32) port map(clk, reset, en, RD, InstrD);
-    regPCF      : flopenr generic(32) port map(clk, reset, en, PC, PCD);
-    regPCPlus4F : flopenr generic(32) port map(clk, reset, en, PCPlus4F, PCPlus4D);
+    regRdF      : flopenr generic map(32) port map(clk, reset, en, RD, InstrD);
+    regPCF      : flopenr generic map(32) port map(clk, reset, en, PC, PCD);
+    regPCPlus4F : flopenr generic map(32) port map(clk, reset, en, PCPlus4F, PCPlus4D);
     
-end architecture arch_regF
+end architecture arch_regF;
