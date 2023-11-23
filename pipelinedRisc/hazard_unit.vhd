@@ -29,12 +29,36 @@ architecture behavioral of hazard_unit is
 
     signal s_stall: std_logic;
 
+begin
+    -- forwarding
+    forward_AE : process (Rs1E, RdM, RdW, RegWriteM, RegWriteW)
+	begin
+		if ((Rs1E == RdM) & RegWriteM) & (Rs1E != "00000") then -- forward from memory stage
+			ForwardAE <= "10";
+		elsif ((Rs1E == RdW) & RegWriteW) & (Rs1E != 0) then -- forward from writeback stage
+			ForwardAE <= "01";
+		else
+			ForwardAE <= "00"; -- no forwarding
+		end if;
+	end process;
+
+	forward_BE : process (Rs2E, RdM, RdW, RegWriteM, RegWriteW)
+	begin
+		if ((Rs2E == RdM) & RegWriteM) & (Rs2E != "00000") then -- forward from memory stage
+			ForwardBE <= "10";
+		elsif ((Rs2E == RdW) & RegWriteW) & (Rs2E != 0) then -- forward from writeback stage
+			ForwardBE <= "01";
+		else
+			ForwardBE <= "00"; -- no forwarding
+		end if;
+	end process;
+
+    -- stall
+    stall_process: process(ResultSrcE0, RdE, Rs1D, Rs2d)
     begin
-        stall_process: process(ResultSrcE0, RdE, Rs1D, Rs2d)
-        begin
-            if(ResultSrcE0 = '0' and ((RdE = Rs1D) or (RdE = Rs2D))) then
-                s_stall <= '1';
-            else s_stall <= '0';
+        if(ResultSrcE0 = '0' and ((RdE = Rs1D) or (RdE = Rs2D))) then
+            s_stall <= '1';
+        else s_stall <= '0';
         end if;
     end process;
 
