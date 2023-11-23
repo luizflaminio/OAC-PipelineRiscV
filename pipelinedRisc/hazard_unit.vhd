@@ -1,3 +1,7 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
 entity hazard_unit is
     port(
         Rs1E            : in std_logic_vector(4 downto 0);
@@ -23,6 +27,19 @@ end entity;
 
 architecture behavioral of hazard_unit is
 
+    signal s_stall: std_logic;
+
     begin
+        stall_process: process(ResultSrcE0, RdE, Rs1D, Rs2d)
+        begin
+            if(ResultSrcE0 = '0' and ((RdE = Rs1D) or (RdE = Rs2D))) then
+                s_stall <= '1';
+            else s_stall <= '0';
+        end if;
+    end process;
+
+    StallF <= s_stall;
+    StallD <= s_stall;
+    FlushE <= s_stall;
 
 end architecture;
