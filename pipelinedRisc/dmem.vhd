@@ -14,7 +14,7 @@ end;
 
 architecture behave of dmem is
 begin
-    process is
+    process (clk, a) is
         type ramtype is array (63 downto 0) of
         STD_LOGIC_VECTOR(31 downto 0);
         variable mem: ramtype;
@@ -28,7 +28,6 @@ begin
         end if;
         
         rd <= mem(to_integer(unsigned(a(7 downto 2))));
-        wait on clk, a;
     end loop;
  end process;
 end;

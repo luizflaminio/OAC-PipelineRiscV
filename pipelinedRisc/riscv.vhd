@@ -20,23 +20,23 @@ architecture struct of riscvsingle is
         funct3          : in  STD_LOGIC_VECTOR(2 downto 0);
         funct7b5, Zero  : in  STD_LOGIC;
         ResultSrc       : out STD_LOGIC_VECTOR(1 downto 0);
-        MemWrite        : out STD_LOGIC;
+        MemWrite        : out std_logic_vector(0 downto 0);
         PCSrc, ALUSrc   : out STD_LOGIC;
-        RegWrite, Jump  : out STD_LOGIC;
+        RegWrite			: out STD_LOGIC;
+        Jump, Branch    : out std_logic_vector(0 downto 0);
         ImmSrc          : out STD_LOGIC_VECTOR(1 downto 0);
         ALUControl      : out STD_LOGIC_VECTOR(2 downto 0));
 
         end component;
 
     component datapath
-
     port(
         clk, reset              : in STD_LOGIC;
         ResultSrcD              : in STD_LOGIC_VECTOR(1  downto 0);
         PCSrc, ALUSrcD          : in STD_LOGIC;
         RegWriteD               : in STD_LOGIC;
         ImmSrcD                 : in STD_LOGIC_VECTOR(1  downto 0);
-        ALUControlD             : in STD_LOGIC_VECTOR(2  downto 0);
+        ALUControlD             : in STD_LOGIC_VECTOR(2  downto 0);   
         Zero                    : out STD_LOGIC;
         PC                      : out STD_LOGIC_VECTOR(31 downto 0);
         RD                      : in  STD_LOGIC_VECTOR(31 downto 0);
@@ -48,9 +48,10 @@ architecture struct of riscvsingle is
         MemWriteM               : out std_logic);
     end component;
 
-    signal ALUSrcD, RegWriteD, JumpD, Zero, PCSrc : STD_LOGIC;
-    signal ResultSrcD, ImmSrcD : STD_LOGIC_VECTOR(1 downto 0);
+    signal ALUSrcD, RegWriteD, Zero, PCSrc : STD_LOGIC;
+    signal s_ImmSrcD, ResultSrcD : STD_LOGIC_VECTOR(1 downto 0);
     signal ALUControlD : STD_LOGIC_VECTOR(2 downto 0);
+    signal MemWriteD, JumpD, BranchD : STD_LOGIC_VECTOR(0 downto 0);
     signal instrucaoD : STD_LOGIC_VECTOR(31 downto 0);
 
 begin
@@ -58,13 +59,13 @@ begin
     c: controller port map(
         instrucaoD(6 downto 0), instrucaoD(14 downto 12),
         instrucaoD(30), Zero, ResultSrcD, MemWriteD,
-        PCSrc, ALUSrcD, RegWriteD, JumpD, 
-        ImmSrcD, ALUControlD, 
+        PCSrc, ALUSrcD, RegWriteD, JumpD, BranchD,
+        s_ImmSrcD, ALUControlD 
     );
 
     dp: datapath port map(
         clk, reset, ResultSrcD, PCSrc, ALUSrcD,
-        RegWriteD, ImmSrcD, ALUControlD, Zero,
+        RegWriteD, s_ImmSrcD, ALUControlD, Zero,
         PC, Instr, ALUResult, WriteData,
         ReadData, instrucaoD, MemWriteD, JumpD, BranchD, MemWrite
     );

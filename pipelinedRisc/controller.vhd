@@ -2,15 +2,15 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
 entity controller is
-    port(   
+    port( 
         op              : in  STD_LOGIC_VECTOR(6 downto 0);
         funct3          : in  STD_LOGIC_VECTOR(2 downto 0);
         funct7b5, Zero  : in  STD_LOGIC;
         ResultSrc       : out STD_LOGIC_VECTOR(1 downto 0);
-        MemWrite        : out STD_LOGIC;
+        MemWrite        : out std_logic_vector(0 downto 0);
         PCSrc, ALUSrc   : out STD_LOGIC;
-        RegWrite        : out STD_LOGIC;
-        Jump            : out STD_LOGIC;
+        RegWrite			: out STD_LOGIC;
+        Jump, Branch    : out std_logic_vector(0 downto 0);
         ImmSrc          : out STD_LOGIC_VECTOR(1 downto 0);
         ALUControl      : out STD_LOGIC_VECTOR(2 downto 0));
 
@@ -39,12 +39,12 @@ architecture struct of controller is
     end component;
 
     signal ALUOp: STD_LOGIC_VECTOR(1 downto 0);
-    signal Branch, s_jump: STD_LOGIC;
+    signal s_Branch, s_jump: STD_LOGIC;
 
 begin
 
     md: maindec port map(
-        op, ResultSrc, MemWrite, Branch,
+        op, ResultSrc, MemWrite(0), s_Branch,
         ALUSrc, RegWrite, s_jump, ImmSrc, ALUOp
     );
 
@@ -52,6 +52,14 @@ begin
         op(5), funct3, funct7b5, ALUOp, ALUControl
     );
    
-    PCSrc <= (Branch and Zero) or s_jump;
-    Jump <= s_jump;
+    PCSrc <= (s_Branch and Zero) or s_jump;
+	
+	 with s_jump select
+		Jump <= 	"1" when '1',
+					"0" when others;
+					
+					
+	  with s_branch select
+		Branch <= 	"1" when '1',
+						"0" when others;
 end;

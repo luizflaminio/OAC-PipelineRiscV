@@ -32,26 +32,26 @@ architecture behavioral of hazard_unit is
 begin
     -- forwarding
     forward_AE : process (Rs1E, RdM, RdW, RegWriteM, RegWriteW)
-	begin
-		if ((Rs1E == RdM) & RegWriteM) & (Rs1E != "00000") then -- forward from memory stage
-			ForwardAE <= "10";
-		elsif ((Rs1E == RdW) & RegWriteW) & (Rs1E != 0) then -- forward from writeback stage
-			ForwardAE <= "01";
-		else
-			ForwardAE <= "00"; -- no forwarding
-		end if;
-	end process;
+    begin
+        if ((Rs1E = RdM) and RegWriteM="1" and (Rs1E /= "00000")) then
+            ForwardAE <= "10"; -- forward from memory stage
+        elsif ((Rs1E = RdW) and RegWriteW="1" and (Rs1E /= "00000")) then
+            ForwardAE <= "01"; -- forward from writeback stage
+        else
+            ForwardAE <= "00"; -- no forwarding
+        end if;
+    end process;
 
 	forward_BE : process (Rs2E, RdM, RdW, RegWriteM, RegWriteW)
-	begin
-		if ((Rs2E == RdM) & RegWriteM) & (Rs2E != "00000") then -- forward from memory stage
-			ForwardBE <= "10";
-		elsif ((Rs2E == RdW) & RegWriteW) & (Rs2E != 0) then -- forward from writeback stage
-			ForwardBE <= "01";
-		else
-			ForwardBE <= "00"; -- no forwarding
-		end if;
-	end process;
+    begin
+        if ((Rs2E = RdM) and RegWriteM="1"and (Rs2E /= "00000")) then
+            ForwardBE <= "10"; -- forward from memory stage
+        elsif ((Rs2E = RdW) and RegWriteW="1" and (Rs2E /= "00000")) then
+            ForwardBE <= "01"; -- forward from writeback stage
+        else
+            ForwardBE <= "00"; -- no forwarding
+        end if;
+    end process;
 
     -- stall
     stall_process: process(ResultSrcE0, RdE, Rs1D, Rs2d)
@@ -65,5 +65,7 @@ begin
     StallF <= s_stall;
     StallD <= s_stall;
     FlushE <= s_stall;
+	 
+	 FlushD <= '0'; 
 
 end architecture;

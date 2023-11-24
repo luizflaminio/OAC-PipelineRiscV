@@ -8,12 +8,12 @@ entity regFileIE_IM is
     port (
         clk, reset, en : in  std_logic;
         RegWriteE, MemWriteE    : in  std_logic_vector(0 downto 0); 
-        ResultScrE              : in  std_logic_vector(1 downto 0);
+        ResultSrcE              : in  std_logic_vector(1 downto 0);
         ALUResultE, WriteDataE  : in  std_logic_vector(31 downto 0);
         RdE                     : in  std_logic_vector(4 downto 0);
         PCPlus4E                : in  std_logic_vector(31 downto 0);
         RegWriteM, MemWriteM    : out std_logic_vector(0 downto 0); 
-        ResultScrM              : out std_logic_vector(1 downto 0); 
+        ResultSrcM              : out std_logic_vector(1 downto 0); 
         ALUResultM, WriteDataM  : out std_logic_vector(31 downto 0);
         RdM                     : out std_logic_vector(4 downto 0);
         PCPlus4M                : out std_logic_vector(31 downto 0)    
@@ -38,7 +38,7 @@ begin
 
     --sinais da UC
     reg_regWriteE       : flopenr generic map(1) port map(clk, reset, en, RegWriteE, RegWriteM);
-    reg_regResultE      : flopenr generic map(2) port map(clk, reset, en, ResultScrE, ResultScrM);
+    reg_regResultE      : flopenr generic map(2) port map(clk, reset, en, ResultSrcE, ResultSrcM);
     regMemWriteE    : flopenr generic map(1) port map(clk, reset, en, MemWriteE, MemWriteM);
         
     

@@ -113,12 +113,12 @@ architecture struct of datapath is
     port (
         clk, reset, en                                  : in  std_logic;
         RegWriteD, MemWriteD, JumpD, BranchD, ALUSrcD   : in  std_logic_vector(0 downto 0); 
-        ResultScrD                                      : in  std_logic_vector(1 downto 0);
+        ResultSrcD                                      : in  std_logic_vector(1 downto 0);
         ALUControlD                                     : in  std_logic_vector(2 downto 0);
         RD1, RD2, PCD, PCPlus4D, ImmExtD                : in  std_logic_vector(31 downto 0);
         RdD, Rs1D, Rs2D                                 : in  std_logic_vector(4 downto 0);
         RegWriteE, MemWriteE, JumpE, BranchE, ALUSrcE   : out std_logic_vector(0 downto 0); 
-        ResultScrE                                      : out std_logic_vector(1 downto 0);
+        ResultSrcE                                      : out std_logic_vector(1 downto 0);
         RD1E, RD2E, PCE, PCPlus4E, ImmExtE              : out std_logic_vector(31 downto 0);
         ALUControlE                                     : out std_logic_vector(2 downto 0);
         RdE, Rs1E, Rs2E                                 : out std_logic_vector(4 downto 0)
@@ -129,12 +129,12 @@ architecture struct of datapath is
         port (
             clk, reset, en          : in  std_logic;
             RegWriteE, MemWriteE    : in  std_logic_vector(0 downto 0); 
-            ResultScrE              : in  std_logic_vector(1 downto 0);
+            ResultSrcE              : in  std_logic_vector(1 downto 0);
             ALUResultE, WriteDataE  : in  std_logic_vector(31 downto 0);
             RdE                     : in  std_logic_vector(4 downto 0);
             PCPlus4E                : in  std_logic_vector(31 downto 0);
             RegWriteM, MemWriteM    : out std_logic_vector(0 downto 0); 
-            ResultScrM              : out std_logic_vector(1 downto 0); 
+            ResultSrcM              : out std_logic_vector(1 downto 0); 
             ALUResultM, WriteDataM  : out std_logic_vector(31 downto 0);
             RdM                     : out std_logic_vector(4 downto 0);
             PCPlus4M                : out std_logic_vector(31 downto 0)    
@@ -145,12 +145,12 @@ architecture struct of datapath is
         port (
             clk, reset, en       : in  std_logic;
             RegWriteM            : in  std_logic_vector(0 downto 0); 
-            ResultScrM           : in  std_logic_vector(1 downto 0);
+            ResultSrcM           : in  std_logic_vector(1 downto 0);
             ALUResultM, PCPlus4M : in  std_logic_vector(31 downto 0);
             RdM                  : in  std_logic_vector(4 downto 0);
             ReadDataM            : in std_logic_vector(31 downto 0);
             RegWriteW            : out std_logic_vector(0 downto 0); 
-            ResultScrW           : out std_logic_vector(1 downto 0);
+            ResultSrcW           : out std_logic_vector(1 downto 0);
             ALUResultW, PCPlus4W : out std_logic_vector(31 downto 0);
             RdW                  : out std_logic_vector(4 downto 0);
             ReadDataW            : out std_logic_vector(31 downto 0)
@@ -158,81 +158,107 @@ architecture struct of datapath is
     end component;
 
     signal PCNext, PCPlus4, PCTarget, s_pc, s_writeData, s_aluResult : STD_LOGIC_VECTOR(31 downto 0);
+    signal not_clk, not_StallF, not_StallD: std_logic;
     
     -- sinais do reg ID/IE
     signal PCD, PCPlus4D : std_logic_vector(31 downto 0);
+	 signal s_RegWriteD, s_ALUSrcD: std_Logic_vector(0 downto 0);
 
     --sinais IE/IF
-    signal JumpE, BranchE, ALUSrcE, RegWriteE, MemWriteE : std_logic;
-    signal ResultScrE : std_logic_vector(0 downto 0);
-    signal RD1E, RD2E, PCE, PCPlus4E, ALUResultE : std_logic_vector(31 downto 0);
-    signal ALUControlE : std_logic_vector(1 downto 0);
+    signal JumpE, BranchE : std_logic_vector(0 downto 0);
+	 signal ResultSrcE : std_logic_vector(1 downto 0);
+    signal ALUSrcE, RegWriteE, MemWriteE : std_logic_vector(0 downto 0);
+    signal ALUControlE : std_logic_vector(2 downto 0);
 
     --sinais IE/IM
-    signal RegWriteM, MemWriteM : std_logic; 
-    signal RD1E, RD2E, PCE, PCPlus4E, ALUResultE : std_logic_vector(31 downto 0);
+    signal RD1E, RD2E, PCE, PCPlus4E, ALUResultE, PCTargetE, writeDataE : std_logic_vector(31 downto 0);
+	 signal SrcBE, SrcAE : std_logic_vector(31 downto 0);
+    signal ZeroE : std_logic;
 
     --sinais IM/IW
+	 signal ALUResultW, ReadDataW, PCPlus4W, s_ALUResultM, PCPlus4M : std_logic_vector(31 downto 0);
+	 signal ResultSrcM, ResultSrcW : std_logic_vector(1 downto 0);
+    signal s_MemWriteM : std_logic_vector (0 downto 0);
 
     --sinais da UH
     signal ImmExtD, ImmExtE:  STD_LOGIC_VECTOR(31 downto 0);
-    signal RD1, RD2:, InstrD  STD_LOGIC_VECTOR(31 downto 0);
+    signal RD1, RD2, s_InstrD : STD_LOGIC_VECTOR(31 downto 0);
     signal ResultW:  STD_LOGIC_VECTOR(31 downto 0);
-    signal ResultSrcE0, PCSrcE, StallF, StalE, FlushD, FlushE : std_logic;
+    signal ResultSrcE0, PCSrcE, StallF, StallD, StalE, FlushD, FlushE : std_logic;
     signal Rs1E, Rs1D, Rs2D, Rs2E, RdE, RdM, RdW : std_logic_vector(4 downto 0);
     signal RegWriteM, RegWriteW: std_logic_vector(0 downto 0);
     signal ForwardAE, ForwardBE: std_logic_vector(1 downto 0);
 begin
+	
+    RS1D <= s_instrD(19 downto 15);
+    RS2D <= s_instrD(24 downto 20);
+
+    not_clk <= not clk;
+    not_StallF <= not StallF;
+    not_StallD <= not StallD;
+
+
+	with RegWriteD select
+		s_RegWriteD <= "1" when '1',
+							"0" when others;
+							
+	with ALUSrcD select
+		s_ALUSrcD <= "1" when '1',
+							"0" when others;
 
     -- next PC logic - IF step
-    pcreg: flopenr generic map(32) port map(clk, reset, not stallF ,PCNext, s_pc);
+    prceg: flopenr generic map(32) port map(clk, reset, not_stallF ,PCNext, s_pc);
     pcadd4: adder port map(s_pc, X"00000004", PCPlus4);
     pcaddbranch: adder port map(PCE, ImmExtE, PCTargetE);
-    pcmux: mux2 generic map(32) port map(PCPlus4, PCTarget, PCSrcE ,PCNext);
+    pcmux: mux2 generic map(32) port map(PCPlus4, PCTargetE, PCSrcE ,PCNext);
 
-    PCSrcE <= JumpE or (BranchE and ZeroE);
+    PCSrcE <= JumpE(0) or (BranchE(0) and ZeroE);
     
     -- register file logic
-    rf: regfile port map(clk, RegWrite, InstrD(19 downto 15), InstrD(24 downto 20), RdW,
+    rf: regfile port map(not_clk, RegWriteW(0), s_InstrD(19 downto 15), s_InstrD(24 downto 20), RdW,
         ResultW, RD1, RD2);
         
-    ext: extend port map(InstrD(31 downto 7), ImmSrcD, ImmExtD);
+    ext: extend port map(s_InstrD(31 downto 7), ImmSrcD, ImmExtD);
     -- ALU logic
     
-    srcbmux: mux2 generic map(32) port map(WriteDataE, ImmExtE, ALUSrcE, SrcBE);
+    srcbmux: mux2 generic map(32) port map(WriteDataE, ImmExtE, ALUSrcE(0), SrcBE);
     mainalu: alu port map(SrcAE, SrcBE, ALUControlE, ALUResultE, ZeroE);
     resultmux: mux3 generic map(32) port map(ALUResultW, ReadDataW, PCPlus4W, ResultSrcW, ResultW);
 
     --new components of pipeline
-    muxSrcAE : mux3 generic map(32) port map(RD1E, ResultW, ALUResultM, ForwardAE, SrcAE);
-    muxAuxSrcBE : mux3 generic map(32) port map(RD2E, ResultW, ALUResultM, ForwardBE, WriteDataE);
+    muxSrcAE : mux3 generic map(32) port map(RD1E, ResultW, s_ALUResultM, ForwardAE, SrcAE);
+    muxAuxSrcBE : mux3 generic map(32) port map(RD2E, ResultW, s_ALUResultM, ForwardBE, WriteDataE);
 
+    ResultSrcE0 <= ResultSrcE(0);
     --Hazard Unit
     HU : hazard_unit port map( 
         Rs1E, Rs2E, Rs1D, Rs2D, RdE, RdM, RdW, RegWriteM, RegWriteW, 
         ResultSrcE0, PCSrcE, ForwardAE, ForwardBE, StallF, StallD, FlushE, FlushD);
 
     -- registers of pipeline
-    regIF_ID : regFileIF_ID port map(clk, FlushD, not StallD, RD, PC, PCPlus4, InstrD, PCD, PCPlus4D); 
+    regIF_ID : regFileIF_ID port map(clk, FlushD, not_StallD, RD, s_pc, PCPlus4, s_InstrD, PCD, PCPlus4D); 
 
     regID_IE : regFileID_IE port map(
-        clk, FlushE, '1', RegWriteD, MemWriteD, JumpD, BranchD, ALUSrcD, 
-        ResultScrD, ALUControlD, RD1, RD2, PCD, PCPlus4D, ImmExtD, instrD(11 downto 7), instrD(19 downto 15), instrD(24 downto 20), RegWriteE, MemWriteE, 
-        JumpE, BranchE, ALUSrcE, ResultScrE, RD1E, RD2E, PCE, PCPlus4E, ImmExtE, ALUControlE, RdE, Rs1E, Rs2E);
+        clk, FlushE, '1', s_RegWriteD, MemWriteD, JumpD, BranchD, s_ALUSrcD, 
+        ResultSrcD, ALUControlD, RD1, RD2, PCD, PCPlus4D, ImmExtD, s_instrD(11 downto 7), s_instrD(19 downto 15), s_instrD(24 downto 20), RegWriteE, MemWriteE, 
+        JumpE, BranchE, ALUSrcE, ResultSrcE, RD1E, RD2E, PCE, PCPlus4E, ImmExtE, ALUControlE, RdE, Rs1E, Rs2E);
     
     regIE_IM : regFileIE_IM port map(
         clk, '0', '1', RegWriteE, MemWriteE, 
-        ResultScrE, ALUResultE, WriteDataE, RdE, PCPlus4E, RegWriteM, MemWriteM, 
-        ResultScrM, ALUResultM, WriteDataM, RdM, PCPlus4M                
+        ResultSrcE, ALUResultE, WriteDataE, RdE, PCPlus4E, RegWriteM, s_MemWriteM, 
+        ResultSrcM, s_ALUResultM, s_writeData, RdM, PCPlus4M                
     );
 
     regIM_IW : regFileIM_IW port map(
         clk, '0', '1', RegWriteM, 
-        ResultScrM, ALUResultM, PCPlus4M, RdM, ReadDataM, RegWriteW, 
-        ResultScrW, ALUResultW, PCPlus4W, RdW, ReadDataW            
+        ResultSrcM, s_ALUResultM, PCPlus4M, RdM, ReadDataM, RegWriteW, 
+        ResultSrcW, ALUResultW, PCPlus4W, RdW, ReadDataW            
     );
     
     PC <= s_pc;
-    ALUResult <= s_aluResult;
-    WriteData <= s_writeData;
+    WriteDataM <= s_writeData;
+	 instrD <= s_instrD;
+    ALUResultM <= s_ALUResultM;
+    MemWriteM <= s_MemWriteM(0);  
+    Zero <= ZeroE;        
 end;
