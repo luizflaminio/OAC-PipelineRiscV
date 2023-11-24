@@ -33,8 +33,11 @@ architecture struct of datapath is
    
     component adder
     port(
-        a, b    : in  STD_LOGIC_VECTOR(31 downto 0);
-        y       :  out STD_LOGIC_VECTOR(31 downto 0));
+        a_maior, b_maior: in std_logic_vector(31 downto 0);
+        cin: in std_logic;
+        s_maior: out std_logic_vector(31 downto 0);
+        cout: out std_logic
+    );
     end component;
     
     component mux2 
@@ -55,11 +58,12 @@ architecture struct of datapath is
     
     component regfile
     port(
-        clk         :  in  STD_LOGIC;
-        we3         :  in  STD_LOGIC;
-        a1, a2, a3  :  in  STD_LOGIC_VECTOR(4  downto 0);
-        wd3         :  in  STD_LOGIC_VECTOR(31 downto 0);
-        rd1, rd2    :  out STD_LOGIC_VECTOR(31 downto 0));
+        clock: in std_logic;
+        reset: in std_logic;
+        we3: in std_logic;
+        a1, a2, a3: in std_logic_vector(4 downto 0);
+        wd3: in std_logic_vector(31 downto 0);
+        rd1, rd2: out std_logic_vector(31 downto 0));
     end component;
 
     component extend
@@ -204,18 +208,18 @@ begin
 							
 	with ALUSrcD select
 		s_ALUSrcD <= "1" when '1',
-							"0" when others;
+					 "0" when others;
 
     -- next PC logic - IF step
     prceg: flopenr generic map(32) port map(clk, reset, not_stallF ,PCNext, s_pc);
-    pcadd4: adder port map(s_pc, X"00000004", PCPlus4);
-    pcaddbranch: adder port map(PCE, ImmExtE, PCTargetE);
+    pcadd4: adder port map(s_pc, std_logic_vector(to_unsigned(4, 32)), '0', PCPlus4, open);
+    pcaddbranch: adder port map(PCE, ImmExtE, '0', PCTargetE, open);
     pcmux: mux2 generic map(32) port map(PCPlus4, PCTargetE, PCSrcE ,PCNext);
 
     PCSrcE <= JumpE(0) or (BranchE(0) and ZeroE);
     
     -- register file logic
-    rf: regfile port map(not_clk, RegWriteW(0), s_InstrD(19 downto 15), s_InstrD(24 downto 20), RdW,
+    rf: regfile port map(not_clk, reset, RegWriteW(0), s_InstrD(19 downto 15), s_InstrD(24 downto 20), RdW,
         ResultW, RD1, RD2);
         
     ext: extend port map(s_InstrD(31 downto 7), ImmSrcD, ImmExtD);

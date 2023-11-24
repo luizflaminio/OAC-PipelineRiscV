@@ -32,7 +32,7 @@ architecture behave of imem is
     signal mem : ramtype := init_ram_hex("riscvtest.txt");
 begin
     -- read memory
-    process(a) begin
+    process(a, mem) begin
         rd <= mem(to_integer(unsigned(a(31 downto 2))));
     end process;
 end;

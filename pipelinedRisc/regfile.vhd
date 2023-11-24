@@ -22,7 +22,7 @@ architecture regfile_arch of regfile is
 begin
     reset_value <= (others => '0');
 
-    bancoDeRegistradores : process(reset, clock)
+    bancoDeRegistradores : process(reset, clock, reset_value, a1, a2, reg_file)
         variable temp_rd1, temp_rd2 : std_logic_vector(31 downto 0);
     begin
         if reset = '1' then

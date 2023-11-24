@@ -4,9 +4,8 @@ use ieee.numeric_std.all;
 
 entity topLevel is
     port(
-        clk, reset: in STD_LOGIC;
-        WriteData, DataAdr: out STD_LOGIC_VECTOR(31 downto 0);
-        MemWrite: out STD_LOGIC
+        clk  :  in STD_LOGIC;
+		  reset: in STD_LOGIC
     );
 end;
 
@@ -52,8 +51,4 @@ begin
     imem1: imem port map(PC, Instr);
 
     dmem1: dmem port map(clk, s_memWrite, s_dataAdr, s_writeData, ReadData);
-
-    WriteData <= s_writeData;
-    DataAdr <= s_dataAdr;
-    MemWrite <= s_memWrite;
 end;

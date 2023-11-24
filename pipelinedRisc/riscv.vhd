@@ -31,21 +31,21 @@ architecture struct of riscvsingle is
 
     component datapath
     port(
-        clk, reset              : in STD_LOGIC;
-        ResultSrcD              : in STD_LOGIC_VECTOR(1  downto 0);
-        PCSrc, ALUSrcD          : in STD_LOGIC;
-        RegWriteD               : in STD_LOGIC;
-        ImmSrcD                 : in STD_LOGIC_VECTOR(1  downto 0);
-        ALUControlD             : in STD_LOGIC_VECTOR(2  downto 0);   
-        Zero                    : out STD_LOGIC;
-        PC                      : out STD_LOGIC_VECTOR(31 downto 0);
-        RD                      : in  STD_LOGIC_VECTOR(31 downto 0);
-        ALUResult, WriteData    : out STD_LOGIC_VECTOR(31 downto 0);
-        ReadData                : in  STD_LOGIC_VECTOR(31 downto 0);
-        instrD                  : out STD_LOGIC_VECTOR(31 downto 0);    
-        MemWriteD               : in  std_logic_vector(0 downto 0); 
-        JumpD, BranchD          : in  std_logic_vector(0 downto 0);
-        MemWriteM               : out std_logic);
+    clk, reset              : in STD_LOGIC;
+    ResultSrcD              : in STD_LOGIC_VECTOR(1  downto 0);
+    PCSrc, ALUSrcD          : in STD_LOGIC;
+    RegWriteD               : in STD_LOGIC;
+    ImmSrcD                 : in STD_LOGIC_VECTOR(1  downto 0);
+    ALUControlD             : in STD_LOGIC_VECTOR(2  downto 0);
+    Zero                    : out STD_LOGIC;
+    PC                      : out STD_LOGIC_VECTOR(31 downto 0);
+    RD                      : in  STD_LOGIC_VECTOR(31 downto 0);
+    ALUResultM, WriteDataM  : out STD_LOGIC_VECTOR(31 downto 0);
+    ReadDataM               : in  STD_LOGIC_VECTOR(31 downto 0);
+    instrD                  : out STD_LOGIC_VECTOR(31 downto 0);    
+    MemWriteD               : in  std_logic_vector(0 downto 0); 
+    JumpD, BranchD          : in  std_logic_vector(0 downto 0);
+    MemWriteM               : out std_logic);
     end component;
 
     signal ALUSrcD, RegWriteD, Zero, PCSrc : STD_LOGIC;

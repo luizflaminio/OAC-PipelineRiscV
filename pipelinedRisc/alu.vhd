@@ -30,8 +30,11 @@ end;
     
     component adder
         port(
-            a, b    : in  STD_LOGIC_VECTOR(31 downto 0);
-            y       :  out STD_LOGIC_VECTOR(31 downto 0));
+        a_maior, b_maior: in std_logic_vector(31 downto 0);
+        cin: in std_logic;
+        s_maior: out std_logic_vector(31 downto 0);
+        cout: out std_logic
+        );
         end component;
         
     component extend
@@ -45,7 +48,7 @@ begin
     not_b <= not b;
 
     mux_somador: mux2 generic map(32) port map(b, not_b, ALUControl(0), op_sum);
-    alu_adder: adder port map(a, op_sum, s_sum);
+    alu_adder: adder port map(a, op_sum, '0', s_sum, open);
 
     overflow <= not(ALUControl(0) xor a(31) xor b(31)) and (a(31) xor s_sum(31)) and not (ALUControl(1));
 

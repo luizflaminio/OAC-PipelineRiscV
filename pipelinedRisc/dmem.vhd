@@ -12,22 +12,20 @@ entity dmem is
     );
 end;
 
+
+
 architecture behave of dmem is
-begin
-    process (clk, a) is
-        type ramtype is array (63 downto 0) of
-        STD_LOGIC_VECTOR(31 downto 0);
-        variable mem: ramtype;
+    type ramtype is array (63 downto 0) of STD_LOGIC_VECTOR(31 downto 0);
+    signal mem : ramtype;
+
     begin
-    -- read or write memory
-    loop
-        if rising_edge(clk) then
-            if (we = '1') then 
-                mem(to_integer(unsigned(a(7 downto 2)))) := wd;
+        wrt: process(clk)
+        begin
+          if (clk='1' and clk'event) then
+            if (we='1') then
+              mem(to_integer(unsigned(a))) <= wd;
             end if;
-        end if;
-        
-        rd <= mem(to_integer(unsigned(a(7 downto 2))));
-    end loop;
- end process;
+          end if;
+        end process;
+        rd <= mem(to_integer(unsigned(a)));
 end;
