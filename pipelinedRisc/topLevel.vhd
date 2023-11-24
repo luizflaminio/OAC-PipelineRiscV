@@ -51,7 +51,7 @@ begin
     
     imem1: imem port map(PC, Instr);
 
-    dmem1: dmem port map(clk, s_memWrite, s_dataAdr, s_writeData,ReadData);
+    dmem1: dmem port map(clk, s_memWrite, s_dataAdr, s_writeData, ReadData);
 
     WriteData <= s_writeData;
     DataAdr <= s_dataAdr;
