@@ -13,7 +13,7 @@ entity hazard_unit is
         RdW             : in std_logic_vector(4 downto 0); 
         RegWriteM       : in std_logic_vector(0 downto 0);
         RegWriteW       : in std_logic_vector(0 downto 0);
-        ResultSrcE0     : in std_logic;
+        ResultSrcE0     : in std_logic;   
         PCSrcE          : in std_logic;
         ForwardAE       : out std_logic_vector(1 downto 0);
         ForwardBE       : out std_logic_vector(1 downto 0);
@@ -64,8 +64,7 @@ begin
 
     StallF <= s_stall;
     StallD <= s_stall;
-    FlushE <= s_stall;
-	 
-	 FlushD <= '0'; 
+    FlushE <= s_stall or PCSrcE; 
+	FlushD <= PCSrcE; 
 
 end architecture;
